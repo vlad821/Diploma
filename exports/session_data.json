@@ -1,0 +1,14 @@
+{
+    "data_columns": [
+        "trn_id",
+        "customer_id",
+        "location_id",
+        "trn_date",
+        "trn_income",
+        "trn_success"
+    ],
+    "data_info": null,
+    "settings": {
+        "theme": "light"
+    }
+}
