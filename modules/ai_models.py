@@ -24,8 +24,6 @@ def explain_with_gpt(user_text):
         st.success(response['choices'][0]['message']['content'])
     except Exception as e:
         st.error(f"Помилка при зверненні до OpenAI: {e}")
-
-# Лінійна регресія
 def linear_regression(df):
     st.subheader("📈 Лінійна регресія")
     num_cols = df.select_dtypes(include='number').columns.tolist()
@@ -74,8 +72,13 @@ def linear_regression(df):
         st.write("🔎 Оцінка моделі:")
         mae = mean_absolute_error(y_test, predictions)
         mse = mean_squared_error(y_test, predictions)
-        st.write(f"MAE: {mae}")
-        st.write(f"MSE: {mse}")
+        rmse = mse ** 0.5
+        r2 = model.score(X_test, y_test)
+
+        st.write(f"MAE: {mae:.4f}")
+        st.write(f"MSE: {mse:.4f}")
+        st.write(f"RMSE: {rmse:.4f}")
+        st.write(f"R²: {r2:.4f}")
 
         # Графік
         fig, ax = plt.subplots()
@@ -86,11 +89,19 @@ def linear_regression(df):
         ax.set_title("📈 Прогноз vs Істинне значення")
         st.pyplot(fig)
 
+        # Опис метрик для GPT
+        regression_metrics_text = """
+        Метрики для задач регресії:
+        - MAE (Mean Absolute Error) — середнє абсолютне відхилення.
+        - MSE (Mean Squared Error) — середньоквадратична помилка.
+        - RMSE (Root Mean Squared Error) — корінь квадратний із середньоквадратичної помилки.
+        - R² (коефіцієнт детермінації) — показує, яку частку варіації цільової змінної пояснює модель.
+        """
+
         # GPT пояснення
-        explain_with_gpt(f"Я навчив модель лінійної регресії. MAE = {mae}, MSE = {mse}. Поясни ці результати.")
+        explain_with_gpt(f"""Я навчив модель лінійної регресії. Оцінки якості:MAE = {mae:.4f}, MSE = {mse:.4f}, RMSE = {rmse:.4f}, R² = {r2:.4f}.Для кращого розуміння використовувалися такі метрики:
+{regression_metrics_text}""")
 
-
-# Логістична регресія
 import pandas as pd
 import streamlit as st
 from sklearn.linear_model import LogisticRegression
@@ -101,7 +112,6 @@ import matplotlib.pyplot as plt
 def logistic_regression(df):
     st.subheader("🔍 Логістична регресія")
 
-    # 1. Перевірка наявності числових колонок
     try:
         num_cols = df.select_dtypes(include='number').columns.tolist()
         if len(num_cols) < 2:
@@ -111,11 +121,9 @@ def logistic_regression(df):
         st.error(f"❌ Помилка при визначенні числових стовпців: {e}")
         return
 
-    # 2. Вибір цільової змінної
     target_col = st.selectbox("Цільова змінна", num_cols, key="target_col_logistic")
     features = [col for col in num_cols if col != target_col]
 
-    # 3. Метод бінаризації
     binarization_method = st.radio(
         "Метод бінаризації (для неперервних змінних):",
         ["Медіана", "Середнє", "Користувацький поріг"]
@@ -137,7 +145,6 @@ def logistic_regression(df):
             return
 
         try:
-            # Автоматична або ручна бінаризація
             if y.nunique() > 2:
                 if binarization_method == "Медіана":
                     threshold = y.median()
@@ -151,7 +158,6 @@ def logistic_regression(df):
                 st.warning(f"⚠️ Цільова змінна була бінаризована (1 якщо > {threshold:.2f}, інакше 0).")
                 y = (y > threshold).astype(int)
 
-            # Перевірка: чи дійсно стало 2 класи
             if y.nunique() != 2:
                 st.error(f"❌ Після бінаризації знайдено {y.nunique()} унікальних класів. Перевірте вхідні дані.")
                 return
@@ -159,14 +165,12 @@ def logistic_regression(df):
             st.error(f"❌ Помилка під час бінаризації: {e}")
             return
 
-        # Розбиття на тренувальні і тестові дані
         try:
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
         except Exception as e:
             st.error(f"❌ Помилка при розділенні даних: {e}")
             return
 
-        # Модель логістичної регресії
         try:
             model = LogisticRegression(max_iter=1000)
             model.fit(X_train, y_train)
@@ -174,11 +178,23 @@ def logistic_regression(df):
             st.error(f"❌ Помилка при навчанні логістичної регресії: {e}")
             return
 
-        # Прогноз і вивід результатів
         try:
             preds = model.predict(X_test)
             st.text("📊 Звіт про класифікацію:")
+            report = classification_report(y_test, preds, output_dict=True)
             st.text(classification_report(y_test, preds))
+
+            accuracy = report['accuracy']
+            precision = report['1']['precision']
+            recall = report['1']['recall']
+            f1 = report['1']['f1-score']
+            r2_score = model.score(X_test, y_test)  # accuracy, умовно як pseudo-R²
+
+            st.write(f"Accuracy (точність): {accuracy:.4f}")
+            st.write(f"Precision (точність позитивних): {precision:.4f}")
+            st.write(f"Recall (повнота): {recall:.4f}")
+            st.write(f"F1-score: {f1:.4f}")
+            st.write(f"Pseudo R² (Accuracy): {r2_score:.4f}")
 
             cm = confusion_matrix(y_test, preds)
             fig, ax = plt.subplots()
@@ -191,9 +207,16 @@ def logistic_regression(df):
             st.error(f"❌ Помилка при оцінюванні моделі: {e}")
             return
 
-        # Пояснення (якщо GPT інтегрований)
         try:
-            explain_with_gpt(f"Я навчив логістичну регресію. Ось звіт: {classification_report(y_test, preds)}")
+            explanation_text = f"""
+            Я навчив логістичну регресію. Метрики моделі:
+            - Accuracy (точність): {accuracy:.4f} — частка правильних передбачень.
+            - Precision (точність позитивних передбачень): {precision:.4f} — як часто модель правильно передбачає позитивний клас.
+            - Recall (повнота): {recall:.4f} — скільки справжніх позитивних випадків було виявлено.
+            - F1-score: {f1:.4f} — гармонійне середнє precision та recall.
+            - Pseudo R² (accuracy): {r2_score:.4f} — наближена оцінка того, скільки варіації цільової змінної пояснює модель.
+            """
+            explain_with_gpt(explanation_text)
         except Exception:
             st.info("✅ Модель навчено. GPT-пояснення наразі недоступне.")
 
