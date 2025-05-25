@@ -6,3 +6,10 @@ matplotlib
 scikit-learn
 seaborn
 python-docx
+pandasql
+plotly.express
+ydata_profiling
+streamlit_pandas_profiling
+pdfplumber
+io
+scipy
