@@ -13,3 +13,4 @@ streamlit_pandas_profiling
 pdfplumber
 io
 scipy
+pdfplumber
