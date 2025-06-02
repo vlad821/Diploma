@@ -22,7 +22,6 @@ if "selected_page" not in st.session_state:
         "💬 SQL через GPT": sql_gpt,
         "📊 Зведені таблиці": pivot_table,
         "⚙️ Налаштування": settings
-
     }.keys())[0]
 
 # --- Пошук

@@ -14,3 +14,5 @@ pdfplumber
 io
 scipy
 pdfplumber
+sqlalchemy
+plotly

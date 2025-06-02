@@ -33,8 +33,6 @@ def generate_sql_with_gpt(user_prompt, column_names, language):
 
 # ==== Основна сторінка Streamlit ====
 def app():
-    st.set_page_config(page_title="SQL + GPT", layout="wide")
-
     # 🌐 Перемикач мови
     language = st.radio("🌐 Виберіть мову / Choose language:", ["Українська", "English"], horizontal=True)
 
@@ -77,6 +75,9 @@ def app():
             sql_query = generate_sql_with_gpt(user_prompt, df.columns.tolist(), language)
 
         if sql_query:
+            # Заміна імені таблиці 'dataframe' на 'df' для pandasql
+            sql_query = sql_query.replace("dataframe", "df")
+
             st.code(sql_query, language="sql")
             try:
                 result = psql.sqldf(sql_query, {"df": df})
@@ -91,5 +92,8 @@ def app():
         else:
             st.warning(labels["gen_fail"])
 
+
+# Для багатосторінкової навігації (не викликайте st.set_page_config тут вдруге!)
 if __name__ == "__main__":
+    st.set_page_config(page_title="SQL + GPT", layout="wide")  # Повинен бути ПЕРШИМ рядком в скрипті
     app()
