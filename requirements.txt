@@ -11,7 +11,6 @@ plotly.express
 ydata_profiling
 streamlit_pandas_profiling
 pdfplumber
-io
 scipy
 pdfplumber
 sqlalchemy
