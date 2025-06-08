@@ -86,11 +86,6 @@ OPENAI_API_KEY = "ваш_ключ"
 python -m streamlit run app.py
 ```
 
----
-Отримати ключ можна тут: [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)
-
----
-
  ## Основні кроки у застосунку:
    - 🔼 **Завантажити CSV-файл**
    - 🔍 **Оглянути структуру даних**
