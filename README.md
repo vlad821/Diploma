@@ -71,22 +71,22 @@ cd Diploma
 pip install -r requirements.txt
 ```
 
-#### 🚀 Крок 3: Запуск застосунку
+### 3. 🔐 Налаштування API-ключа
+
+#### 📄 Крок 3: Створіть файл `.streamlit/secrets.toml` і додайте:
+
+```toml
+OPENAI_API_KEY = "ваш_ключ"
+```
+Отримати ключ можна тут: [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)
+
+#### 🚀 Крок 4: Запуск застосунку
 
 ```bash
 python -m streamlit run app.py
 ```
 
 ---
-
-### 3. 🔐 Налаштування API-ключа
-
-#### 📄 Крок 4: Створіть файл `.streamlit/secrets.toml` і додайте:
-
-```toml
-OPENAI_API_KEY = "ваш_ключ"
-```
-
 Отримати ключ можна тут: [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)
 
 ---
